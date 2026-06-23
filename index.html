@@ -1,0 +1,44 @@
+# プロジェクトフォルダー作成
+New-Item -ItemType Directory -Force "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR"
+New-Item -ItemType Directory -Force "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR\css"
+New-Item -ItemType Directory -Force "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR\js"
+New-Item -ItemType Directory -Force "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR\assets\models"
+
+# 龍モデル候補を優先順で探してコピー
+$srcRoot = "C:\Users\user\Documents\ARDragon"
+$dst = "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR\assets\models\dragon.glb"
+
+$priority = @(
+  "ARDRAGON_01.glb",
+  "dragon.glb",
+  "Dragon.glb",
+  "ARDragon.glb"
+)
+
+$found = $null
+
+foreach ($name in $priority) {
+  $candidate = Get-ChildItem -Path $srcRoot -Recurse -File -Include $name -ErrorAction SilentlyContinue | Select-Object -First 1
+  if ($candidate) {
+    $found = $candidate.FullName
+    break
+  }
+}
+
+if (-not $found) {
+  $candidate = Get-ChildItem -Path $srcRoot -Recurse -File -Include *.glb,*.gltf -ErrorAction SilentlyContinue | Select-Object -First 1
+  if ($candidate) {
+    $found = $candidate.FullName
+  }
+}
+
+if ($found) {
+  Copy-Item $found $dst -Force
+  Write-Host "龍モデルをコピーしました: $found -> $dst"
+} else {
+  Write-Host "龍モデルが見つかりませんでした。.glb または .gltf を assets\models\dragon.glb として配置してください。"
+}
+
+# ローカルサーバー起動
+cd "C:\Users\user\Documents\ARDragon\PalmDragon_WebAR"
+python -m http.server 8000
