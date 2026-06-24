@@ -347,7 +347,10 @@ function createPalmRing() {
   });
 
   palmRing = new THREE.Mesh(geometry, material);
-  palmRing.rotation.x = Math.PI * 0.5;
+
+  // 画面正面から円形に見えるようにする
+  palmRing.rotation.x = 0;
+
   palmRing.visible = false;
 
   dragonRoot.add(palmRing);
