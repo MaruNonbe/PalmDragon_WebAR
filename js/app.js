@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
 import {
   HandLandmarker,
@@ -303,6 +304,9 @@ async function loadDragonModel() {
 
   const loader = new GLTFLoader();
 
+  // ARDRAGON_01.glb が Meshopt圧縮されているため必要
+  loader.setMeshoptDecoder(MeshoptDecoder);
+
   const gltf = await loader.loadAsync(DRAGON_MODEL_PATH);
 
   dragonModel = gltf.scene;
@@ -317,6 +321,11 @@ async function loadDragonModel() {
         child.material.transparent = true;
         child.material.opacity = 0;
         child.material.depthWrite = true;
+
+        if ("emissive" in child.material) {
+          child.material.emissive = child.material.emissive || new THREE.Color(0x000000);
+          child.material.emissiveIntensity = 0.12;
+        }
       }
     }
   });
